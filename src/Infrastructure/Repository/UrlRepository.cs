@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using UrlShortenerService.Application.Common.Interfaces;
 
 namespace UrlShortenerService.Infrastructure.Repository;
@@ -22,6 +23,11 @@ public class UrlRepository : IUrlRepository
         }
 
         return null;
+    }
+
+    public async Task<Domain.Entities.Url?> FindUrlByIdAsync(long id, CancellationToken cancellationToken)
+    {
+        return await _context.Urls.FindAsync(id, cancellationToken);
     }
 
     public async Task<Domain.Entities.Url> AddNewUrlEntityAsync(string url, CancellationToken cancellationToken)

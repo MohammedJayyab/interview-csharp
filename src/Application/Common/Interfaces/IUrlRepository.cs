@@ -11,4 +11,6 @@ public interface IUrlRepository
     Task<Domain.Entities.Url?> GetExistingUrlAsync(string url, CancellationToken cancellationToken);
 
     Task<Domain.Entities.Url> AddNewUrlEntityAsync(string url, CancellationToken cancellationToken);
+
+    Task<Domain.Entities.Url?> FindUrlByIdAsync(long id, CancellationToken cancellationToken);
 }
