@@ -1,6 +1,7 @@
-using FluentValidation;
+﻿using FluentValidation;
 using HashidsNet;
 using MediatR;
+using UrlShortenerService.Application.Common.Exceptions;
 using UrlShortenerService.Application.Common.Interfaces;
 
 namespace UrlShortenerService.Application.Url.Commands;
@@ -22,18 +23,38 @@ public class RedirectToUrlCommandValidator : AbstractValidator<RedirectToUrlComm
 
 public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand, string>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUrlRepository _urlRepository;
     private readonly IHashids _hashids;
 
-    public RedirectToUrlCommandHandler(IApplicationDbContext context, IHashids hashids)
+    public RedirectToUrlCommandHandler(IUrlRepository urlRepository, IHashids hashids)
     {
-        _context = context;
+        _urlRepository = urlRepository;
         _hashids = hashids;
     }
 
     public async Task<string> Handle(RedirectToUrlCommand request, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        var decodedId = DecodeSingleIdFromRequest(request);
+        var url = await _urlRepository.FindUrlByIdAsync(decodedId, cancellationToken);
+
+        if (url == null || url.OriginalUrl == null)
+        {
+            throw new NotFoundException($"No URL found for request Id: {decodedId}.");
+        }
+
+        return url.OriginalUrl;
+    }
+
+    private long DecodeSingleIdFromRequest(RedirectToUrlCommand request)
+    {
+        var decodedIds = _hashids.DecodeLong(request.Id);
+        var decodedId = decodedIds.FirstOrDefault();
+
+        if (decodedId == 0)
+        {
+            throw new NotFoundException($"Request Id: {request.Id} not fond.");
+        }
+
+        return decodedId;
     }
 }
