@@ -4,6 +4,7 @@ using UrlShortenerService.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using UrlShortenerService.Infrastructure.Services;
+using UrlShortenerService.Infrastructure.Repository;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -26,6 +27,7 @@ public static class ConfigureServices
         }
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUrlRepository, UrlRepository>();
 
         services.AddScoped<ApplicationDbContextInitialiser>();
 

@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using HashidsNet;
 using MediatR;
 using UrlShortenerService.Application.Common.Interfaces;
@@ -22,12 +22,12 @@ public class CreateShortUrlCommandValidator : AbstractValidator<CreateShortUrlCo
 
 public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlCommand, string>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUrlRepository _urlRepository;
     private readonly IHashids _hashids;
 
-    public CreateShortUrlCommandHandler(IApplicationDbContext context, IHashids hashids)
+    public CreateShortUrlCommandHandler(IUrlRepository urlRepository, IHashids hashids)
     {
-        _context = context;
+        _urlRepository = urlRepository;
         _hashids = hashids;
     }
 
