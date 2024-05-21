@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using HashidsNet;
 using MediatR;
+using UrlShortenerService.Application.Common.Exceptions;
 using UrlShortenerService.Application.Common.Interfaces;
 
 namespace UrlShortenerService.Application.Url.Commands;
@@ -33,7 +34,22 @@ public class CreateShortUrlCommandHandler : IRequestHandler<CreateShortUrlComman
 
     public async Task<string> Handle(CreateShortUrlCommand request, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-        throw new NotImplementedException();
+        try
+        {
+            var existingUrl = await _urlRepository.GetExistingUrlAsync(request.Url, cancellationToken);
+
+            if (existingUrl != null)
+            {
+                return _hashids.EncodeLong(existingUrl.Id);
+            }
+
+            var newUrlEntity = await _urlRepository.AddNewUrlEntityAsync(request.Url, cancellationToken);
+
+            return _hashids.EncodeLong(newUrlEntity.Id);
+        }
+        catch (Exception)
+        {
+            throw new ShortUrlCreationException("An error occurred while creating the short URL.");
+        }
     }
 }

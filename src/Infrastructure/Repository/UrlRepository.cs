@@ -14,7 +14,14 @@ public class UrlRepository : IUrlRepository
 
     public async Task<Domain.Entities.Url?> GetExistingUrlAsync(string url, CancellationToken cancellationToken)
     {
-        return await _context.Urls.FirstOrDefaultAsync(u => u.OriginalUrl == url, cancellationToken);
+        var urlEntityExists = await _context.Urls.AnyAsync(u => u.OriginalUrl.Equals(url), cancellationToken);
+
+        if (urlEntityExists)
+        {
+            return await _context.Urls.FirstOrDefaultAsync(u => u.OriginalUrl.Equals(url), cancellationToken);
+        }
+
+        return null;
     }
 
     public async Task<Domain.Entities.Url> AddNewUrlEntityAsync(string url, CancellationToken cancellationToken)
