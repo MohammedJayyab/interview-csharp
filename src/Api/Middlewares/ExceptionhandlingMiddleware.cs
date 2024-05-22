@@ -1,4 +1,4 @@
-using UrlShortenerService.Application.Common.Exceptions;
+﻿using UrlShortenerService.Application.Common.Exceptions;
 
 namespace UrlShortenerService.Api.Middlewares;
 
@@ -21,6 +21,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             { typeof(NotFoundException), HandleNotFoundException },
             { typeof(ValidationException), HandleValidationException },
             { typeof(NotImplementedException), HandleNotImplementedException },
+            { typeof(ShortUrlCreationException), HandleShortUrlCreationException }
         };
     }
 
@@ -68,6 +69,20 @@ public class ExceptionHandlingMiddleware : IMiddleware
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         context.Response
             .WriteAsJsonAsync((exception as NotFoundException)!.Message)
+            .GetAwaiter()
+            .GetResult();
+    }
+
+    /// <summary>
+    /// Handler for ShortUrlCreationException.
+    /// </summary>
+    /// <param name="context">The http context.</param>
+    /// <param name="exception">The raised exception.</param>
+    private void HandleShortUrlCreationException(HttpContext context, Exception exception)
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response
+            .WriteAsJsonAsync((exception as ShortUrlCreationException)!.Message)
             .GetAwaiter()
             .GetResult();
     }
