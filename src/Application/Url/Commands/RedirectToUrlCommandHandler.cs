@@ -21,7 +21,7 @@ public class RedirectToUrlCommandHandler : IRequestHandler<RedirectToUrlCommand,
         var decodedId = DecodeSingleIdFromRequest(request);
         var url = await _urlRepository.FindUrlByIdAsync(decodedId, cancellationToken);
 
-        if (url == null || url.OriginalUrl == null)
+        if (url == null)
         {
             throw new NotFoundException($"No URL found for request Id: '{decodedId}'.");
         }
